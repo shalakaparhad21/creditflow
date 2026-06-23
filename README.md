@@ -1,132 +1,141 @@
-# CreditFlow - Banking Credit Approval System
+# CreditFlow — Banking DSA Pipeline
 
-Full-stack credit card approval system for banks using 7 DSA algorithms, CIBIL-weighted scoring, and Basel III risk metrics. Processes 1,000 customers under ₹50L budget.
-
----
-
-## 🏦 What This Project Does
-
-Simulates real banking credit card approval for **1,000 customers** using rules from:
-- **Indian banks**: HDFC, ICICI, SBI (CIBIL scores 300-900, tier-based limits)
-- **International banks**: JP Morgan, Citi, Deutsche Bank, Barclays (Basel III PD/LGD/EL/RWA)
-
-When a bank receives thousands of credit card applications daily, it must answer 3 questions:
-1. **Should we approve this customer?** (credit score + risk flags)
-2. **What limit should we give?** (tier-based multiplier on income)
-3. **What is our risk exposure?** (Basel III PD/LGD/EL/RWA)
-
-CreditFlow answers all 3 questions automatically.
+> A Java-based credit scoring and capital allocation system that simulates real-world banking workflows using core Data Structures & Algorithms, Basel III credit risk metrics, and an interactive frontend dashboard.
 
 ---
 
-## 🔑 Key Features
+## 📌 Project Overview
 
-### ✅ CIBIL Credit Scoring (300-900)
-Calculates score from 5 factors with real Indian weights:
-- **Payment History**: 35% (most important)
-- **Credit Utilization**: 30%
-- **Debt-to-Income**: 20%
-- **Spend Stability**: 10%
-- **Salary Consistency**: 5%
+CreditFlow processes **1,000 synthetic customer profiles** through a multi-stage credit evaluation pipeline — from feature extraction and CIBIL-style scoring to risk network analysis and capital allocation — all within a ₹50 lakh budget constraint.
 
-### ✅ Tier-Based Approval
-
-| Tier | Score Range | Interest | Credit Limit |
-|------|-------------|----------|--------------|
-| **A** | 750-900 | 18% | 3× monthly income |
-| **B** | 600-749 | 24% | 1.5× income |
-| **C** | 500-599 | 36% | 0.5× income |
-| **Rejected** | < 500 | — | — |
-
-### ✅ Capital Allocation Optimization
-- Bank has **₹50L total budget** for credit limits
-- Uses **0/1 Knapsack DP** to maximize revenue while staying under budget
-- Allocates optimally to best customers (Tier A > Tier B > Tier C)
-
-### ✅ Fraud Detection
-- Detects **fraud clusters** (customers with linked accounts, same phone/address)
-- Uses **Union-Find algorithm** for O(1) connectivity checks
-- 1,000x faster than DFS/BFS for repeated queries
-
-### ✅ Basel III Risk Metrics (International Banks)
-- **PD** (Probability of Default): Chance of default in 1 year
-- **LGD** (Loss Given Default): Loss if default occurs
-- **EL** (Expected Loss): PD × LGD × EAD
-- **RWA** (Risk Weighted Assets): EL × 0.75
-- Required for JP Morgan, Citi, Deutsche Bank, Barclays
-
-### ✅ Visual Reports
-- **Dashboard** (`index.html`): All 1,000 customers with scores, tiers, limits
-- **Individual Report** (`credit-analysis.html`): Detailed breakdown with Chart.js radar charts
-- Shows score components, transaction analysis, peer comparison, recommendations
+Built as a Java DSA project with a BFSI (Banking, Financial Services & Insurance) domain focus, it demonstrates how algorithms like Segment Trees, Union-Find, Graph BFS/DFS, and 0/1 Knapsack DP are used in real credit risk systems.
 
 ---
 
-## 💻 Tech Stack
+## 🏗️ System Architecture
+Customer Data (1000 profiles)
+        │
+        ▼
+┌─────────────────────┐
+│  Feature Extraction  │  ← Sliding Window (Deque) on transaction history
+│  (TransactionStream) │
+└────────┬────────────┘
+         │
+         ▼
+┌─────────────────────┐
+│   Credit Scoring     │  ← Weighted formula (CIBIL/FICO methodology)
+│   (CreditScorer)     │     Payment 35% | Utilization 30% | DTI 20%
+└────────┬────────────┘     Stability 10% | Salary 5%
+         │
+         ▼
+┌─────────────────────┐
+│   Approval Engine    │  ← Decision Tree: Hard reject rules → Tier A/B/C
+│   (ApprovalEngine)   │     Basel III: PD, LGD, EL, RWA calculation
+└────────┬────────────┘
+         │
+         ▼
+┌──────────────────────────────────────────────────┐
+│              Risk Analysis Layer                  │
+│  ┌─────────────────┐  ┌──────────────────────┐   │
+│  │  BorrowerGraph   │  │    CustomerIndex      │   │
+│  │  BFS + DFS       │  │    TreeMap (Red-Black)│   │
+│  │  Union-Find      │  │    SegmentTree        │   │
+│  └─────────────────┘  └──────────────────────┘   │
+└────────┬─────────────────────────────────────────┘
+         │
+         ▼
+┌─────────────────────┐
+│  Capital Allocation  │  ← 0/1 Knapsack DP within ₹50L budget
+│  (CapitalAllocator)  │
+└────────┬────────────┘
+         │
+         ▼
+  Console Report + Frontend Dashboard (HTML/CSS/JS)
 
-| Layer | Technology |
-|-------|-----------|
-| **Backend** | Java 17 (immutable classes, streams, records) |
-| **Frontend** | HTML5, CSS3, Chart.js (radar + bar charts) |
-| **DSA** | Union-Find, Segment Tree, Graph DFS/BFS, Min-Heap, Knapsack DP, TreeMap, Deque |
 
 ---
 
-## 📊 DSA Algorithms Used
+## ✅ Features
 
-| Algorithm | Use Case | Time Complexity |
-|-----------|----------|-----------------|
-| **Union-Find** | Fraud cluster detection | O(α(n)) ≈ O(1) |
-| **Segment Tree** | Range sum/max queries on credit limits | O(log n) |
-| **Graph DFS** | 3-color cycle detection in borrower network | O(V + E) |
-| **Graph BFS** | Cascade default simulation | O(V + E) |
-| **Min-Heap** | Top-k riskiest customers | O(log k) |
-| **Knapsack DP** | Capital allocation under ₹50L budget | O(n × budget) |
-| **TreeMap** | Score indexing (quick tier lookups) | O(log n) |
+### Core Pipeline
+- **Batch Mode** — Score all 1,000 customers, generate aggregate report
+- **Single Customer Mode** — Enter any Customer ID (e.g. `C00042`) for full credit analysis
+- **Data Generation** — Seeded random customer profiles with realistic Indian banking parameters
+
+### DSA Algorithms Implemented
+| Algorithm | Class | Banking Use Case |
+|---|---|---|
+| **Segment Tree** | `SegmentTree.java` | O(log n) range sum queries on credit limits by score band |
+| **TreeMap (Red-Black Tree)** | `CustomerIndex.java` | Sorted score indexing, percentile rank, range queries |
+| **Graph + BFS** | `BorrowerGraph.java` | Cascade simulation — who gets impacted if one borrower defaults |
+| **Graph + DFS (3-color)** | `BorrowerGraph.java` | Circular guarantor dependency detection |
+| **Union-Find (DSU)** | `UnionFind.java` | Borrower risk cluster grouping (path compression + union by rank) |
+| **0/1 Knapsack DP** | `CapitalAllocator.java` | Maximize expected revenue within capital budget |
+| **Sliding Window (Deque)** | `TransactionStream.java` | Behavioral feature extraction from transaction history |
+| **Min-Heap (PriorityQueue)** | `ScoringPipeline.java` | Top-N riskiest approved customers |
+| **Decision Tree** | `ApprovalEngine.java` | Hard reject rules + tier classification |
+
+### Basel III Credit Risk Metrics
+Each approved customer gets:
+- **PD** (Probability of Default) — based on credit score
+- **LGD** (Loss Given Default) — based on credit tier
+- **EAD** (Exposure at Default) — assigned credit limit
+- **EL** (Expected Loss) = PD × LGD × EAD
+- **RWA** (Risk Weighted Assets) = EL × 0.75
+
+These are the same metrics used by JP Morgan, Citi, Deutsche Bank, and Barclays under Basel III regulation.
+
+### Credit Scoring Formula (CIBIL/FICO-inspired)
+| Component | Weight |
+|---|---|
+| Payment History | 35% |
+| Credit Utilization | 30% |
+| Debt-to-Income Ratio | 20% |
+| Spend Stability | 10% |
+| Salary Consistency | 5% |
+
+Output: Integer score in range **[300, 900]**
+
+### Approval & Tiering
+| Tier | Score Range | Interest Rate | Max Limit |
+|---|---|---|---|
+| A | 750 – 900 | 18% p.a. | ₹10,00,000 |
+| B | 600 – 749 | 24% p.a. | ₹5,00,000 |
+| C | 500 – 599 | 36% p.a. | ₹2,00,000 |
+| Rejected | < 500 | — | — |
+
+Hard reject rules: Score < 500 | Missed payments > 3 | DTI > 55% | Utilization > 90%
+
+### Frontend Dashboard
+Interactive HTML/CSS/JS dashboard with:
+- **Batch Report** — Scoring summary, segment tree range queries, risk network stats, capital allocation
+- **Single Customer** — Full credit analysis with Basel III breakdown
+- **Credit Analysis Page** — Visual score breakdown per component
 
 ---
 
-## 🏦 Real Banking Mapping
+---
 
-**Indian Banks (HDFC, ICICI, SBI):**
-- CIBIL scores 300-900 (actual Indian credit bureau)
-- Tier-based limits (3× / 1.5× / 0.5× income)
-- Interest rates 18%/24%/36% (real credit card rates)
+## 🔧 Technologies Used
 
-**International Banks (JP Morgan, Citi, Deutsche, Barclays):**
-- Basel III compliance (PD/LGD/EL/RWA)
-- Capital adequacy 8% per Basel III
-- Risk-weighted pricing (Tier A = lower PD, lower rate)
-
-**NBFCs (Bajaj Finance, IIFL):**
-- Same approval logic for personal loans
-- Fraud detection for loan applicants
-- Capital optimization for limited budget
+- **Language**: Java 17
+- **Data Structures**: TreeMap, PriorityQueue, Deque, HashMap, ArrayList
+- **Algorithms**: Segment Tree, Union-Find, BFS, DFS, 0/1 Knapsack DP, Sliding Window
+- **Domain**: BFSI — Credit Risk, Basel III, CIBIL Scoring, Capital Allocation
+- **Frontend**: Vanilla HTML5, CSS3, JavaScript (no frameworks)
 
 ---
 
-## 📈 Performance
+## 🎯 Learning Outcomes
 
-- **1,000 customers**: ~200ms total processing time
-- **O(n) pipeline**: Scoring + approval for all customers
-- **O(log n) queries**: Segment Tree for range lookups
-- **O(1) connectivity**: Union-Find for fraud detection
-
----
-
-## 🚦 How to Run
-
-```bash
-cd CreditFlow
-javac -d out src/com/creditflow/*.java
-java -cp out com.creditflow.runner.Main
-```
-
-**Output:**
-- `batch-report.txt`: Analysis of all 1,000 customers
-- `frontend/index.html`: Open in browser for dashboard
-- `frontend/credit-analysis.html?id=C00042`: Individual report
+- Applied DSA in a real-world BFSI domain context (not just textbook problems)
+- Implemented Basel III regulatory framework (PD/LGD/EL/RWA) used by global banks
+- Designed a multi-layer decision system (feature extraction → scoring → approval → allocation)
+- Built a modular, package-structured Java codebase with separation of concerns
 
 ---
 
 
+
+
+  
