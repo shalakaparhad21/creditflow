@@ -14,43 +14,80 @@ Built as a Java DSA project with a BFSI (Banking, Financial Services & Insurance
 
 ## 🏗️ System Architecture
 Customer Data (1000 profiles)
-        │
-        ▼
+
+│
+
+▼
+
 ┌─────────────────────┐
+
 │  Feature Extraction  │  ← Sliding Window (Deque) on transaction history
+
 │  (TransactionStream) │
+
 └────────┬────────────┘
-         │
-         ▼
+
+│
+
+▼
+
 ┌─────────────────────┐
+
 │   Credit Scoring     │  ← Weighted formula (CIBIL/FICO methodology)
+
 │   (CreditScorer)     │     Payment 35% | Utilization 30% | DTI 20%
+
 └────────┬────────────┘     Stability 10% | Salary 5%
-         │
-         ▼
+
+│
+
+▼
+
 ┌─────────────────────┐
+
 │   Approval Engine    │  ← Decision Tree: Hard reject rules → Tier A/B/C
+
 │   (ApprovalEngine)   │     Basel III: PD, LGD, EL, RWA calculation
+
 └────────┬────────────┘
-         │
-         ▼
+
+│
+
+▼
+
 ┌──────────────────────────────────────────────────┐
+
 │              Risk Analysis Layer                  │
+
 │  ┌─────────────────┐  ┌──────────────────────┐   │
+
 │  │  BorrowerGraph   │  │    CustomerIndex      │   │
+
 │  │  BFS + DFS       │  │    TreeMap (Red-Black)│   │
+
 │  │  Union-Find      │  │    SegmentTree        │   │
+
 │  └─────────────────┘  └──────────────────────┘   │
+
 └────────┬─────────────────────────────────────────┘
-         │
-         ▼
+
+│
+
+▼
+
 ┌─────────────────────┐
+
 │  Capital Allocation  │  ← 0/1 Knapsack DP within ₹50L budget
+
 │  (CapitalAllocator)  │
+
 └────────┬────────────┘
-         │
-         ▼
-  Console Report + Frontend Dashboard (HTML/CSS/JS)
+
+│
+
+▼
+
+Console Report + Frontend Dashboard (HTML/CSS/JS)
 
 
 ---
